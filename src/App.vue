@@ -59,13 +59,12 @@ const drinkArr = ref([
   }
 ])
 
-const addAmount = (id) => {
-  const index = drinkArr.value.findIndex((obj) => obj.id === id)
+const addAmount = (index) => {
   drinkArr.value[index].amount++
 }
 
-const minusAmount = (id) => {
-  const index = drinkArr.value.findIndex((obj) => obj.id === id)
+const minusAmount = (index) => {
+  // const index = drinkArr.value.findIndex((obj) => obj.id === id)
   if (drinkArr.value[index].amount !== 0) {
     drinkArr.value[index].amount--
   }
@@ -73,6 +72,7 @@ const minusAmount = (id) => {
 
 const showModal = ref(false)
 const tempDrink = ref({
+  index: null,
   id: null,
   name: '',
   description: '',
@@ -80,9 +80,9 @@ const tempDrink = ref({
   amount: null
 })
 
-const editModal = (item) => {
-  const index = drinkArr.value.findIndex((obj) => obj.id === item.id)
+const editModal = (item, index) => {
   showModal.value = true
+  tempDrink.value.index = index
   tempDrink.value.id = item.id
   tempDrink.value.name = item.name
   tempDrink.value.description = item.description
@@ -91,10 +91,9 @@ const editModal = (item) => {
 }
 
 const confirmEdit = () => {
-  const index = drinkArr.value.findIndex((obj) => obj.id === tempDrink.value.id)
-  drinkArr.value[index].name = tempDrink.value.name
-  drinkArr.value[index].description = tempDrink.value.description
-  drinkArr.value[index].price = tempDrink.value.price
+  drinkArr.value[tempDrink.value.index].name = tempDrink.value.name
+  drinkArr.value[tempDrink.value.index].description = tempDrink.value.description
+  drinkArr.value[tempDrink.value.index].price = tempDrink.value.price
   showModal.value = false
 }
 </script>
@@ -129,7 +128,7 @@ const confirmEdit = () => {
           <th scope="col"></th>
         </tr>
       </thead>
-      <tbody v-for="(item, key) in drinkArr" :key="item.id">
+      <tbody v-for="(item, index) in drinkArr" :key="item.id">
         <tr>
           <td>{{ item.name }}</td>
           <td>
@@ -137,16 +136,16 @@ const confirmEdit = () => {
           </td>
           <td>{{ item.price }}</td>
           <td>
-            <button type="button" class="btn btn-outline-info" @click="minusAmount(item.id)">
+            <button type="button" class="btn btn-outline-info" @click="minusAmount(index)">
               -
             </button>
             {{ item.amount }}
-            <button type="button" class="btn btn-outline-info" @click="addAmount(item.id)">
-              +
-            </button>
+            <button type="button" class="btn btn-outline-info" @click="addAmount(index)">+</button>
           </td>
           <td>
-            <button type="button" class="btn btn-primary" @click="editModal(item)">編輯</button>
+            <button type="button" class="btn btn-primary" @click="editModal(item, index)">
+              編輯
+            </button>
           </td>
         </tr>
       </tbody>
