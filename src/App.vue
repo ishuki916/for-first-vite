@@ -66,7 +66,9 @@ const addAmount = (id) => {
 
 const minusAmount = (id) => {
   const index = drinkArr.value.findIndex((obj) => obj.id === id)
-  drinkArr.value[index].amount--
+  if (drinkArr.value[index].amount !== 0) {
+    drinkArr.value[index].amount--
+  }
 }
 
 const showModal = ref(false)
