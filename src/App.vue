@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 const drinkArr = ref([
   {
     id: 1,
@@ -58,7 +58,6 @@ const drinkArr = ref([
     amount: 20
   }
 ])
-const tempAmount = ref()
 
 const addAmount = (id) => {
   const index = drinkArr.value.findIndex((obj) => obj.id === id)
@@ -68,6 +67,33 @@ const addAmount = (id) => {
 const minusAmount = (id) => {
   const index = drinkArr.value.findIndex((obj) => obj.id === id)
   drinkArr.value[index].amount--
+}
+
+const showModal = ref(false)
+const tempDrink = ref({
+  id: null,
+  name: '',
+  description: '',
+  price: null,
+  amount: null
+})
+
+const editModal = (item) => {
+  const index = drinkArr.value.findIndex((obj) => obj.id === item.id)
+  showModal.value = true
+  tempDrink.value.id = item.id
+  tempDrink.value.name = item.name
+  tempDrink.value.description = item.description
+  tempDrink.value.price = item.price
+  tempDrink.value.amount = item.amount
+}
+
+const confirmEdit = () => {
+  const index = drinkArr.value.findIndex((obj) => obj.id === tempDrink.value.id)
+  drinkArr.value[index].name = tempDrink.value.name
+  drinkArr.value[index].description = tempDrink.value.description
+  drinkArr.value[index].price = tempDrink.value.price
+  showModal.value = false
 }
 </script>
 
@@ -98,6 +124,7 @@ const minusAmount = (id) => {
           <th scope="col">描述</th>
           <th scope="col">價格</th>
           <th scope="col">庫存</th>
+          <th scope="col"></th>
         </tr>
       </thead>
       <tbody v-for="(item, key) in drinkArr" :key="item.id">
@@ -116,8 +143,57 @@ const minusAmount = (id) => {
               +
             </button>
           </td>
+          <td>
+            <button type="button" class="btn btn-primary" @click="editModal(item)">編輯</button>
+          </td>
         </tr>
       </tbody>
     </table>
+    <div
+      v-if="showModal"
+      class="modal fade show d-block"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">編輯</h5>
+            <button
+              type="button"
+              class="btn-close"
+              @click="showModal = false"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="col-sm-2 col-form-label">品項：</label>
+              <input type="text" v-model="tempDrink.name" />
+            </div>
+            <div class="mb-3">
+              <label class="col-sm-2 col-form-label">描述：</label>
+              <input type="text" v-model="tempDrink.description" />
+            </div>
+            <div class="mb-3">
+              <label class="col-sm-2 col-form-label">價格：</label>
+              <input type="text" v-model="tempDrink.price" />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="showModal = false">關閉</button>
+            <button type="button" class="btn btn-primary" @click="confirmEdit">確定</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+<style>
+.modal.fade.show.d-block {
+  display: block;
+}
+</style>
