@@ -11,7 +11,7 @@
             <a class="nav-link active" aria-current="page" href="#"><RouterLink to="/first-week">Week 1</RouterLink></a>
           </li>
           <li class="nav-item">
-            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true"><RouterLink to="/second-week">Week 2</RouterLink></a>
+            <a class="nav-link active" href="#" tabindex="-1" aria-disabled="true"><RouterLink to="/second-week">Week 2</RouterLink></a>
           </li>
           <li class="nav-item">
             <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Week 3</a>

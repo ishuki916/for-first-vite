@@ -4,6 +4,10 @@ import SecondWeek from '../views/SecondWeek.vue'
 
 const routes = [
   {
+    path: '/',
+    redirect: '/second-week' // 將根路徑重定向
+  },
+  {
     path: '/first-week',
     component: FirstWeek
   },

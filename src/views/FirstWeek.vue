@@ -175,7 +175,7 @@ const confirmEdit = () => {
 
 </template>
 
-<style>
+<style scoped>
 .modal.fade.show.d-block {
   display: block;
 }
