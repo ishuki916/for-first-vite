@@ -18,6 +18,11 @@ const showTodo = ref(false)
 const showLogin = ref(true)
 const nickName = ref('')
 
+const closeModal = () => {
+  showModal.value = false
+  signUpErrMsg.value = ''
+}
+
 const login = async () => {
   loginErrMsg.value = ''
   try {
@@ -184,9 +189,9 @@ const signOut = async () => {
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="showModal = false">關閉</button>
+          <button type="button" class="btn btn-secondary" @click="closeModal">關閉</button>
           <button type="button" class="btn btn-primary" @click="signUp">確定</button>
-          <p>{{ signUpErrMsg }}</p>
+          <p class="customErrMsg">{{ signUpErrMsg }}</p>
         </div>
       </div>
     </div>
