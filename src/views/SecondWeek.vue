@@ -18,6 +18,7 @@ const showTodo = ref(false)
 const showLogin = ref(true)
 const toDoList = ref([])
 const content = ref('')
+const showEdit = ref(false)
 
 const closeModal = () => {
   showModal.value = false
@@ -119,6 +120,49 @@ const insertTodo = async () => {
     console.log(err.response.data.message)
   } finally {
     content.value = ''
+  }
+}
+
+const editTodo = async (toDO) => {
+  try {
+    console.log(toDO)
+    const myCookie = document.cookie.replace(/(?:(?:^|.*;\s*)tkn\s*\=\s*([^;]*).*$)|^.*$/, '$1')
+    const res = await axios.put(
+      `https://todolist-api.hexschool.io/todos/${toDO.id}`,
+      { content: toDO.content },
+      {
+        headers: {
+          authorization: myCookie
+        }
+      }
+    )
+    console.log(res)
+    toDoList.value.forEach((item, index) => {
+      if (item.id === toDO.id) {
+        toDoList.value[index].content = toDO.content
+      }
+    })
+  } catch (err) {
+    console.log(err.response.data.message)
+  }
+}
+
+const deleteToDo = async (toDO) => {
+  try {
+    const myCookie = document.cookie.replace(/(?:(?:^|.*;\s*)tkn\s*\=\s*([^;]*).*$)|^.*$/, '$1')
+    const res = await axios.delete(`https://todolist-api.hexschool.io/todos/${toDO.id}`, {
+      headers: {
+        authorization: myCookie
+      }
+    })
+    console.log(res)
+    toDoList.value.forEach((item, index) => {
+      if (item.id === toDO.id) {
+        toDoList.value.splice(index, 1)
+      }
+    })
+  } catch (err) {
+    console.log(err.response.data.message)
   }
 }
 </script>
@@ -270,6 +314,16 @@ const insertTodo = async () => {
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col col-xl-10">
           <div class="card" style="border-radius: 15px">
+            <div v-if="showEdit === false">
+              <button type="button" class="btn btn-outline-secondary m-3" @click="showEdit = true">
+                >> Go to Edit mode
+              </button>
+            </div>
+            <div v-else>
+              <button type="button" class="btn btn-outline-secondary m-3" @click="showEdit = false">
+                >> Back to View mode
+              </button>
+            </div>
             <div class="card-body p-5">
               <h4 class="mb-3">To-do List</h4>
 
@@ -302,14 +356,23 @@ const insertTodo = async () => {
                       aria-label="..."
                       :checked="toDO.status"
                     />
-                    <p v-if="toDO.status">
+                    <div v-if="toDO.status">
                       <s> {{ toDO.content }}</s>
-                    </p>
-                    <p v-else>{{ toDO.content }}</p>
+                    </div>
+                    <div v-else-if="showEdit === true">
+                      <input type="text" class="form-control" :value="toDO.content" />
+                    </div>
+                    <div v-else>
+                      {{ toDO.content }}
+                    </div>
                   </div>
-                  <div>
-                    <button type="button" class="btn btn-warning">edit</button>
-                    <button type="button" class="btn btn-danger">remove</button>
+                  <div v-if="showEdit === true">
+                    <button @click="editTodo(toDO)" type="button" class="btn btn-outline-warning">
+                      confirm edit
+                    </button>
+                    <button @click="deleteToDo(toDO)" type="button" class="btn btn-outline-danger">
+                      delete
+                    </button>
                   </div>
                 </li>
               </ul>
