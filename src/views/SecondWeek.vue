@@ -3,8 +3,8 @@ import { ref, watch, onMounted } from 'vue'
 import axios from 'axios'
 
 const user = ref({
-  email: '456@gmail.com',
-  password: '12345678'
+  email: '',
+  password: ''
 })
 const newUser = ref({
   email: '',
@@ -125,7 +125,6 @@ const insertTodo = async () => {
 
 const editTodo = async (toDO) => {
   try {
-    console.log(toDO)
     const myCookie = document.cookie.replace(/(?:(?:^|.*;\s*)tkn\s*\=\s*([^;]*).*$)|^.*$/, '$1')
     const res = await axios.put(
       `https://todolist-api.hexschool.io/todos/${toDO.id}`,
@@ -164,6 +163,31 @@ const deleteToDo = async (toDO) => {
   } catch (err) {
     console.log(err.response.data.message)
   }
+}
+
+const toggleToDo = async (toDO) => {
+  try {
+    const myCookie = document.cookie.replace(/(?:(?:^|.*;\s*)tkn\s*\=\s*([^;]*).*$)|^.*$/, '$1')
+    const res = await axios.patch(
+      `https://todolist-api.hexschool.io/todos/${toDO.id}/toggle`,
+      {},
+      {
+        headers: {
+          authorization: myCookie
+        }
+      }
+    )
+    toDoList.value.forEach((item, index) => {
+      if (item.id === toDO.id) {
+        toDoList.value[index].status = !toDO.status
+      }
+    })
+  } catch (err) {
+    console.log(err.response.data.message)
+  }
+}
+const customReload = () => {
+  location.reload()
 }
 </script>
 
@@ -320,7 +344,7 @@ const deleteToDo = async (toDO) => {
               </button>
             </div>
             <div v-else>
-              <button type="button" class="btn btn-outline-secondary m-3" @click="showEdit = false">
+              <button type="button" class="btn btn-outline-secondary m-3" @click="customReload">
                 >> Back to View mode
               </button>
             </div>
@@ -355,21 +379,24 @@ const deleteToDo = async (toDO) => {
                       value=""
                       aria-label="..."
                       :checked="toDO.status"
+                      @change="toggleToDo(toDO)"
                     />
                     <div v-if="toDO.status">
                       <s> {{ toDO.content }}</s>
                     </div>
                     <div v-else-if="showEdit === true">
-                      <input type="text" class="form-control" :value="toDO.content" />
+                      <input type="text" class="form-control" v-model="toDO.content" />
                     </div>
                     <div v-else>
                       {{ toDO.content }}
                     </div>
                   </div>
                   <div v-if="showEdit === true">
-                    <button @click="editTodo(toDO)" type="button" class="btn btn-outline-warning">
-                      confirm edit
-                    </button>
+                    <div v-if="!toDO.status">
+                      <button @click="editTodo(toDO)" type="button" class="btn btn-outline-warning">
+                        edit
+                      </button>
+                    </div>
                     <button @click="deleteToDo(toDO)" type="button" class="btn btn-outline-danger">
                       delete
                     </button>
