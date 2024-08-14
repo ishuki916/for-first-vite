@@ -1,9 +1,9 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import axios from 'axios'
 
 const user = ref({
-  email: '123@gmail.com',
+  email: '456@gmail.com',
   password: '12345678'
 })
 const newUser = ref({
@@ -16,7 +16,8 @@ const signUpErrMsg = ref('')
 const showModal = ref(false)
 const showTodo = ref(false)
 const showLogin = ref(true)
-const nickName = ref('')
+const toDoList = ref([])
+const content = ref('')
 
 const closeModal = () => {
   showModal.value = false
@@ -29,9 +30,7 @@ const login = async () => {
     const res = await axios.post('https://todolist-api.hexschool.io/users/sign_in', user.value)
     showLogin.value = false
     showTodo.value = true
-    console.log(res)
     document.cookie = `tkn=${res.data.token}; expires=${res.data.exp};path=/; `
-    nickName.value = res.data.nickname
   } catch (err) {
     console.log(err.response.data.message)
     loginErrMsg.value = err.response.data.message
@@ -39,8 +38,9 @@ const login = async () => {
 }
 
 const signUp = async () => {
-  console.log(showModal.value)
   signUpErrMsg.value = ''
+  loginErrMsg.value = ''
+
   try {
     const res = await axios.post('https://todolist-api.hexschool.io/users/sign_up', newUser.value)
     showModal.value = false
@@ -72,6 +72,53 @@ const signOut = async () => {
     }
   } catch (err) {
     console.log(err.response.data.message)
+  }
+}
+
+onMounted(async () => {
+  if (document.cookie.includes('tkn=')) {
+    showLogin.value = false
+    showTodo.value = true
+  } else {
+    showLogin.value = true
+    showTodo.value = false
+  }
+})
+
+watch(showTodo, async (newVal) => {
+  try {
+    if (newVal) {
+      const myCookie = document.cookie.replace(/(?:(?:^|.*;\s*)tkn\s*\=\s*([^;]*).*$)|^.*$/, '$1')
+      const res = await axios.get('https://todolist-api.hexschool.io/todos', {
+        headers: {
+          authorization: myCookie
+        }
+      })
+
+      toDoList.value = res.data.data
+    }
+  } catch (err) {
+    console.log(err.response.data.message)
+  }
+})
+
+const insertTodo = async () => {
+  try {
+    const myCookie = document.cookie.replace(/(?:(?:^|.*;\s*)tkn\s*\=\s*([^;]*).*$)|^.*$/, '$1')
+    const res = await axios.post(
+      'https://todolist-api.hexschool.io/todos',
+      { content: content.value },
+      {
+        headers: {
+          authorization: myCookie
+        }
+      }
+    )
+    toDoList.value.push(res.data.newTodo)
+  } catch (err) {
+    console.log(err.response.data.message)
+  } finally {
+    content.value = ''
   }
 }
 </script>
@@ -213,7 +260,6 @@ const signOut = async () => {
           height="32"
           class="rounded-circle"
         />
-        {{ nickName }}
       </a>
       <ul class="dropdown-menu dropdown-menu-end text-small" aria-labelledby="dropdownUser1">
         <li><a class="dropdown-item" href="#" @click="signOut">Sign out</a></li>
@@ -234,13 +280,18 @@ const signOut = async () => {
                     id="form3"
                     class="form-control form-control-lg"
                     placeholder="What do you need to do today?"
+                    v-model="content"
                   />
                 </div>
-                <button type="submit" class="btn btn-warning btn-lg ms-2">Add</button>
+                <button type="button" class="btn btn-warning btn-lg ms-2" @click="insertTodo">
+                  Add
+                </button>
               </form>
 
               <ul class="list-group mb-0">
                 <li
+                  v-for="toDO in toDoList"
+                  :key="toDO.id"
                   class="list-group-item d-flex justify-content-between align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2"
                 >
                   <div class="d-flex align-items-center">
@@ -249,27 +300,16 @@ const signOut = async () => {
                       type="checkbox"
                       value=""
                       aria-label="..."
+                      :checked="toDO.status"
                     />
-                    Cras justo odio
+                    <p v-if="toDO.status">
+                      <s> {{ toDO.content }}</s>
+                    </p>
+                    <p v-else>{{ toDO.content }}</p>
                   </div>
                   <div>
                     <button type="button" class="btn btn-warning">edit</button>
                     <button type="button" class="btn btn-danger">remove</button>
-                  </div>
-                </li>
-
-                <li
-                  class="list-group-item d-flex d-flex justify-content-between align-items-center border-start-0 border-top-0 border-end-0 border-bottom rounded-0 mb-2"
-                >
-                  <div class="d-flex align-items-center">
-                    <input
-                      class="form-check-input me-2"
-                      type="checkbox"
-                      value=""
-                      aria-label="..."
-                      checked
-                    />
-                    <s>Dapibus ac facilisis in</s>
                   </div>
                 </li>
               </ul>
