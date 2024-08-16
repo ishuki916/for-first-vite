@@ -1,11 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import FirstWeek from '../views/FirstWeek.vue'
 import SecondWeek from '../views/SecondWeek.vue'
+import ThirdWeek from '../views/ThirdWeek.vue'
 
 const routes = [
   {
     path: '/',
-    redirect: '/second-week' // 將根路徑重定向
+    redirect: '/third-week' // 將根路徑重定向
   },
   {
     path: '/first-week',
@@ -14,6 +15,10 @@ const routes = [
   {
     path: '/second-week',
     component: SecondWeek
+  },
+  {
+    path: '/third-week',
+    component: ThirdWeek
   }
 ]
 
