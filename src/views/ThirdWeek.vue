@@ -32,7 +32,16 @@ const orderCart = ref([])
 const confirmedOrder = ref([])
 
 const addToCart = (drink) => {
-  orderCart.value.push(drink)
+  let isDouble = false
+  orderCart.value.forEach((element) => {
+    if (element.id === drink.id) {
+      alert('不可加入重複的品項')
+      isDouble = true
+    }
+  })
+  if (!isDouble) {
+    orderCart.value.push(drink)
+  }
 }
 const handleChangeCount = (id, count, amount) => {
   orderCart.value.forEach((element) => {
