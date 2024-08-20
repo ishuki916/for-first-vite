@@ -1,6 +1,15 @@
 <script setup>
-import { defineProps } from 'vue'
-const props = defineProps(['name', 'description', 'price'])
+import { defineProps, ref, defineEmits, watch } from 'vue'
+const props = defineProps(['id', 'name', 'description', 'price'])
+const count = ref(0)
+const amount = ref(0)
+const emit = defineEmits(['change-count'])
+const changeCount = () => {
+  amount.value = props.price * count.value
+}
+watch(amount, (newAmount) => {
+  emit('change-count', props.id, count.value, amount.value)
+})
 </script>
 
 <template>
@@ -11,7 +20,7 @@ const props = defineProps(['name', 'description', 'price'])
       <small>{{ props.description }}</small>
     </td>
     <td>
-      <select class="form-select">
+      <select class="form-select" v-model="count" @change="changeCount">
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
@@ -24,8 +33,8 @@ const props = defineProps(['name', 'description', 'price'])
         <option value="10">10</option>
       </select>
     </td>
-    <td>45</td>
     <td>{{ props.price }}</td>
+    <td>{{ amount }}</td>
   </tr>
 </template>
 <style scoped></style>
