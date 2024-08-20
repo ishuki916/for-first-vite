@@ -1,7 +1,7 @@
 <script setup>
-import { defineProps, ref, defineEmits, watch } from 'vue'
+import { defineProps, ref, defineEmits, watch, onMounted } from 'vue'
 const props = defineProps(['id', 'name', 'description', 'price'])
-const count = ref(0)
+const count = ref(1)
 const amount = ref(0)
 const emit = defineEmits(['change-count'])
 const changeCount = () => {
@@ -9,6 +9,9 @@ const changeCount = () => {
 }
 watch(amount, (newAmount) => {
   emit('change-count', props.id, count.value, amount.value)
+})
+onMounted(() => {
+  amount.value = props.price * 1
 })
 </script>
 
