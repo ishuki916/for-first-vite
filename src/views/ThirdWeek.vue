@@ -43,6 +43,7 @@ const handleChangeCount = (id, count, amount) => {
   })
 }
 const cartSum = ref(0)
+const finalCartSum = ref(0)
 watch(
   orderCart,
   (neworderCart) => {
@@ -57,9 +58,9 @@ watch(
 const remark = ref('')
 const handleSendOrder = (text) => {
   remark.value = text
+  finalCartSum.value = cartSum.value
   confirmedOrder.value = orderCart.value
   orderCart.value = []
-  remark.value = ''
 }
 </script>
 <template>
@@ -137,7 +138,7 @@ const handleSendOrder = (text) => {
                 </div>
                 <div class="text-end">
                   <h5>
-                    總計: <span>${{ cartSum }}</span>
+                    總計: <span>${{ finalCartSum }}</span>
                   </h5>
                 </div>
               </div>
