@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import DrinkMenu from './DrinkMenu.vue'
 import OrderCartSum from './OrderCartSum.vue'
 import OrderCartDetail from './OrderCartDetail.vue'
@@ -41,6 +41,25 @@ const handleChangeCount = (id, count, amount) => {
       element.amount = amount
     }
   })
+}
+const cartSum = ref(0)
+watch(
+  orderCart,
+  (neworderCart) => {
+    console.log('watch')
+    cartSum.value = 0
+    orderCart.value.forEach((element) => {
+      cartSum.value += element.amount
+    })
+  },
+  { deep: true }
+)
+const remark = ref('')
+const handleSendOrder = (text) => {
+  remark.value = text
+  confirmedOrder.value = orderCart.value
+  orderCart.value = []
+  remark.value = ''
 }
 </script>
 <template>
@@ -89,7 +108,11 @@ const handleChangeCount = (id, count, amount) => {
               </tr>
             </tbody>
           </table>
-          <OrderCartSum v-if="orderCart.length !== 0" />
+          <OrderCartSum
+            v-if="orderCart.length !== 0"
+            :cartSum="cartSum"
+            @send-order="handleSendOrder"
+          />
         </div>
       </div>
       <hr />
@@ -107,13 +130,15 @@ const handleChangeCount = (id, count, amount) => {
                       <th scope="col">小計</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <ConfirmedOrder />
-                  </tbody>
+                  <ConfirmedOrder :confirmedOrder="confirmedOrder" />
                 </table>
-                <div class="text-end">備註: <span>都不要香菜</span></div>
                 <div class="text-end">
-                  <h5>總計: <span>$145</span></h5>
+                  備註: <span>{{ remark }}</span>
+                </div>
+                <div class="text-end">
+                  <h5>
+                    總計: <span>${{ cartSum }}</span>
+                  </h5>
                 </div>
               </div>
             </div>

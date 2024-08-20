@@ -1,19 +1,19 @@
-<script setup></script>
+<script setup>
+import { defineProps } from 'vue'
+const props = defineProps({
+  confirmedOrder: {
+    type: Array,
+    required: true
+  }
+})
+</script>
 <template>
-  <tr>
-    <td>翡翠檸檬</td>
-    <td>7</td>
-    <td>385</td>
-  </tr>
-  <tr>
-    <td>冬瓜檸檬</td>
-    <td>7</td>
-    <td>315</td>
-  </tr>
-  <tr>
-    <td>冬瓜檸檬</td>
-    <td>4</td>
-    <td>180</td>
-  </tr>
+  <tbody>
+    <tr v-for="order in confirmedOrder" :key="order.id">
+      <td>{{ order.name }}</td>
+      <td>{{ order.count }}</td>
+      <td>{{ order.amount }}</td>
+    </tr>
+  </tbody>
 </template>
 <style scoped></style>
