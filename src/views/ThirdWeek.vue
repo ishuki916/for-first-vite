@@ -11,7 +11,7 @@ const drinkMenu = ref([
   {
     id: 4,
     name: '四季春茶',
-    description: '香醇四季春茶，回甘無比',
+    description: '香醇四季春茶回甘無比',
     price: 45,
     count: 1,
     amount: 45
@@ -47,7 +47,6 @@ const finalCartSum = ref(0)
 watch(
   orderCart,
   (neworderCart) => {
-    console.log('watch')
     cartSum.value = 0
     orderCart.value.forEach((element) => {
       cartSum.value += element.amount
@@ -61,6 +60,13 @@ const handleSendOrder = (text) => {
   finalCartSum.value = cartSum.value
   confirmedOrder.value = orderCart.value
   orderCart.value = []
+}
+const handleDelete = (id) => {
+  orderCart.value.forEach((element, index) => {
+    if (element.id === id) {
+      orderCart.value.splice(index, 1)
+    }
+  })
 }
 </script>
 <template>
@@ -100,6 +106,7 @@ const handleSendOrder = (text) => {
                 :description="order.description"
                 :price="order.price"
                 @change-count="handleChangeCount"
+                @handle-delete="handleDelete"
               />
 
               <tr v-if="orderCart.length === 0">

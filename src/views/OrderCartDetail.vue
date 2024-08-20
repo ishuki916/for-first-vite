@@ -3,7 +3,7 @@ import { defineProps, ref, defineEmits, watch, onMounted } from 'vue'
 const props = defineProps(['id', 'name', 'description', 'price'])
 const count = ref(1)
 const amount = ref(0)
-const emit = defineEmits(['change-count'])
+const emit = defineEmits(['change-count', 'handle-delete'])
 const changeCount = () => {
   amount.value = props.price * count.value
 }
@@ -13,11 +13,14 @@ watch(amount, (newAmount) => {
 onMounted(() => {
   amount.value = props.price * 1
 })
+const handleDelete = () => {
+  emit('handle-delete', props.id)
+}
 </script>
 
 <template>
   <tr>
-    <td><button type="button" class="btn btn-sm">x</button></td>
+    <td><button type="button" class="btn btn-sm" @click="handleDelete">x</button></td>
     <td>{{ props.name }}</td>
     <td>
       <small>{{ props.description }}</small>
